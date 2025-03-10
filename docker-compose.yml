@@ -1,0 +1,65 @@
+services:
+  #mysql:
+  #  image: mysql:8
+  #  container_name: mysql
+  #  restart: always
+  #  env_file: .env
+  #  environment:
+  #    MYSQL_ROOT_PASSWORD: ${DB_PASS}
+  #    MYSQL_DATABASE: ${DB_NAME}
+  #  ports:
+  #    - "3306:3306"
+  #  volumes:
+  #    - mysql_data:/var/lib/mysql
+
+  airflow:
+    image: apache/airflow:2.6.2
+    container_name: airflow
+    restart: always
+    env_file: .env
+  #  depends_on:
+  #    - preprocess
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./dags:/opt/airflow/dags
+      - ./airflow_logs:/opt/airflow/logs
+
+  preprocess:
+    build: ./preprocess
+    container_name: preprocess
+    restart: "no"
+    env_file: .env
+   # depends_on:
+   #   - mysql
+    volumes:
+      - ./preprocess:/app
+
+#  train:
+#    build: ./train
+#    container_name: train
+#    restart: "no"
+#    env_file: .env
+#    depends_on:
+#      - preprocess
+#    volumes:
+#      - ./train:/app
+#      - model_storage:/app/models  # Volumen compartido
+
+ # api:
+ #   build: ./api
+ #   container_name: api
+ #   restart: always
+ #   env_file: .env
+ #   depends_on:
+ #     - train
+ #   ports:
+ #     - "${API_PORT}:8000"
+ #   volumes:
+ #     - ./api:/app
+ #     - model_storage:/app/models  # Volumen compartido
+
+volumes:
+  mysql_data:
+  airflow_logs:
+  model_storage:

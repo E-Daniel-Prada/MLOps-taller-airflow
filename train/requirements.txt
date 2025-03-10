@@ -1,0 +1,5 @@
+pandas
+pymysql
+scikit-learn
+cryptography
+scikit-learn
