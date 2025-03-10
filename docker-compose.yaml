@@ -294,5 +294,35 @@ services:
       airflow-init:
         condition: service_completed_successfully
 
+  mysql:
+    image: mysql:8
+    container_name: mysql
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: airflow_db
+      MYSQL_USER: airflow
+      MYSQL_PASSWORD: airflow
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql-data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      retries: 5
+      start_period: 10s
+
+  api-service:
+    image: tiangolo/uvicorn-gunicorn-fastapi:python3.9
+    container_name: api-service
+    volumes:
+      - ./api:/app
+    ports:
+      - "8000:8000"
+    depends_on:
+      - mysql
+
 volumes:
   postgres-db-volume:
+  mysql-data:
