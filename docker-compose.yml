@@ -157,6 +157,7 @@ services:
       - ./app:/opt/airflow/app  # Montar la carpeta 'app'
     environment:
       <<: *airflow-common-env
+      _PIP_ADDITIONAL_REQUIREMENTS: "mysql-connector-python sqlalchemy pandas pymysql cryptography scikit-learn"
       # Required to handle warm shutdown of the celery workers properly
       # See https://airflow.apache.org/docs/docker-stack/entrypoint.html#signal-propagation
       DUMB_INIT_SETSID: "0"
@@ -188,7 +189,7 @@ services:
     command:
       - -c
       - |
-        pip install --no-cache-dir mysql-connector-python sqlalchemy pandas pymysql cryptography scikit-learn
+        gosu airflow pip install --no-cache-dir mysql-connector-python sqlalchemy pandas pymysql cryptography scikit-learn
         function ver() {
           printf "%04d%04d%04d%04d" $${1//./ }
         }

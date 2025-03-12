@@ -5,17 +5,15 @@ import pickle
 from sklearn.model_selection import train_test_split
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import accuracy_score
-from dotenv import load_dotenv
+from pathlib import Path
 
-# Cargar variables de entorno
-load_dotenv()
+# Definir la ruta del modelo dentro de ese directorio
+MODEL_PATH = "/opt/airflow/app/model/penguin_model.pkl"
 
-DB_HOST = os.getenv("DB_HOST")
-DB_USER = os.getenv("DB_USER")
-DB_PASS = os.getenv("DB_PASS")
-DB_NAME = os.getenv("DB_NAME")
-
-MODEL_PATH = "./api/models/penguin_model.pkl"
+DB_HOST = "mysql"
+DB_USER = "airflow"
+DB_PASS = "password"
+DB_NAME = "ml_db"
 
 # Conectar a la base de datos y cargar los datos preprocesados
 def load_data():
@@ -47,7 +45,7 @@ def train_model():
     with open(MODEL_PATH, "wb") as model_file:
         pickle.dump(model, model_file)
 
-    print("Modelo guardado correctamente en 'model.pkl'.")
+    print("Modelo guardado correctamente en ",MODEL_PATH )
 
 if __name__ == "__main__":
     train_model()

@@ -5,20 +5,13 @@ import numpy as np
 import ssl
 import urllib.request
 
-from dotenv import load_dotenv
-
-# Obtener la ruta del archivo .env en la raíz del proyecto
-dotenv_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), '.env')
-
-# Cargar variables de entorno
-load_dotenv(dotenv_path)
 
 ssl._create_default_https_context = ssl._create_unverified_context
 
-DB_HOST = os.getenv("DB_HOST")
-DB_USER = os.getenv("DB_USER")
-DB_PASS = os.getenv("DB_PASS")
-DB_NAME = os.getenv("DB_NAME")
+DB_HOST = "mysql"
+DB_USER = "airflow"
+DB_PASS = "password"
+DB_NAME = "ml_db"
 
 def load_data():
     df = pd.read_csv("https://raw.githubusercontent.com/mwaskom/seaborn-data/master/penguins.csv")

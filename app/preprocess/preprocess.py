@@ -4,13 +4,10 @@ import os
 from dotenv import load_dotenv
 from sqlalchemy import create_engine
 
-# Cargar variables de entorno
-load_dotenv()
-
-DB_HOST = os.getenv("DB_HOST")
-DB_USER = os.getenv("DB_USER")
-DB_PASS = os.getenv("DB_PASS")
-DB_NAME = os.getenv("DB_NAME")
+DB_HOST = "mysql"
+DB_USER = "airflow"
+DB_PASS = "password"
+DB_NAME = "ml_db"
 
 def preprocess():
     # Conectar a la base de datos y cargar los datos
