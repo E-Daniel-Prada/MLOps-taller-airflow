@@ -2,21 +2,22 @@ FROM apache/airflow:latest
 
 USER root
 
-# Instalar dependencias necesarias
+# Instalar dependencias del sistema para MySQL
 RUN apt-get update && apt-get install -y \
     libmysqlclient-dev \
     && rm -rf /var/lib/apt/lists/*
 
 USER airflow
 
-# Copiar los DAGs al contenedor
-COPY dags/ /opt/airflow/dags/
-
-# Copiar archivos de configuración si es necesario
+# Copiar archivos de configuración
 COPY requirements.txt /requirements.txt
 
-# Instalar dependencias adicionales
+# Instalar dependencias adicionales de Airflow correctamente
+RUN pip install --no-cache-dir apache-airflow[mysql] pymysql sqlalchemy python-dotenv
 RUN pip install --no-cache-dir -r /requirements.txt
+
+# Copiar los DAGs al contenedor
+COPY dags/ /opt/airflow/dags/
 
 # Iniciar Airflow
 CMD ["webserver"]
