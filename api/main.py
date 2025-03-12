@@ -5,7 +5,7 @@ from pydantic import BaseModel
 import os
 
 # Cargar el modelo entrenado
-MODEL_PATH = "./api/models/penguin_model.pkl"
+MODEL_PATH = "models/penguin_model.pkl"
 
 if not os.path.exists(MODEL_PATH):
     raise FileNotFoundError(f"No se encontró el modelo en {MODEL_PATH}. Asegúrate de entrenarlo antes de usar la API.")
