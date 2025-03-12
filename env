@@ -1,0 +1,13 @@
+# Base de datos
+DB_HOST=mysql #Cambiar a mysql al desplegar en docker
+DB_USER=airflow
+DB_PASS=password
+DB_NAME=ml_db
+
+# API
+MODEL_PATH=/app/model.pkl
+API_PORT=8000
+
+# Airflow
+AIRFLOW__CORE__EXECUTOR=LocalExecutor
+AIRFLOW__CORE__SQL_ALCHEMY_CONN=mysql+mysqlconnector://root:password@mysql/ml_db
