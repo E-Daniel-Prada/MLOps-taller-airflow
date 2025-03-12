@@ -4,8 +4,8 @@ x-airflow-common:
   environment:
     &airflow-common-env
     AIRFLOW__CORE__EXECUTOR: CeleryExecutor
-    AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: mysql+pymysql://airflow:airflow@mysql:3306/airflow?charset=utf8mb4
-    AIRFLOW__CELERY__RESULT_BACKEND: db+mysql://airflow:airflow@mysql:3306/airflow
+    AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://airflow:airflow@postgres/airflow
+    AIRFLOW__CELERY__RESULT_BACKEND: db+postgresql://airflow:airflow@postgres/airflow
     AIRFLOW__CELERY__BROKER_URL: redis://:@redis:6379/0
     AIRFLOW__CORE__FERNET_KEY: ''
     AIRFLOW__CORE__DAGS_ARE_PAUSED_AT_CREATION: 'true'
@@ -17,26 +17,44 @@ x-airflow-common:
     - ./airflow/dags:/opt/airflow/dags
     - ./airflow_logs:/opt/airflow/logs
     - ./airflow/plugins:/opt/airflow/plugins
-  user: "50000:0"
+  user: "${AIRFLOW_UID:-50000}:0"
   depends_on:
     &airflow-common-depends-on
     redis:
+      condition: service_healthy
+    postgres:
       condition: service_healthy
     mysql:
       condition: service_healthy
 
 services:
+  postgres:
+    image: postgres:13
+    restart: always
+    environment:
+      POSTGRES_USER: airflow
+      POSTGRES_PASSWORD: airflow
+      POSTGRES_DB: airflow
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres-db-volume:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U airflow"]
+      interval: 10s
+      retries: 5
+      start_period: 5s
+
   mysql:
     image: mysql:5.7
     restart: always
     environment:
       MYSQL_ROOT_PASSWORD: root
-      MYSQL_DATABASE: airflow
+      MYSQL_DATABASE: airflow_data
       MYSQL_USER: airflow
       MYSQL_PASSWORD: airflow
     ports:
       - "3306:3306"
-    command: --sql_mode=""  
     volumes:
       - mysql-db-volume:/var/lib/mysql
       - ./mysql/init.sql:/docker-entrypoint-initdb.d/init.sql
@@ -104,7 +122,7 @@ services:
       - |
         mkdir -p /opt/airflow/logs /opt/airflow/dags /opt/airflow/plugins
         chmod -R 777 /opt/airflow/logs /opt/airflow/dags /opt/airflow/plugins
-        exec /entrypoint airflow db init && airflow db migrate && airflow users create --username admin --firstname Admin --lastname User --role Admin --email admin@example.com --password admin
+        exec /entrypoint airflow db migrate
     environment:
       <<: *airflow-common-env
       _AIRFLOW_DB_MIGRATE: 'true'
@@ -116,4 +134,5 @@ services:
       - ./airflow:/opt/airflow
 
 volumes:
+  postgres-db-volume:
   mysql-db-volume:
